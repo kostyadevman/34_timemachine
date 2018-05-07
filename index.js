@@ -1,5 +1,20 @@
 var TIMEOUT_IN_SECS = 3 * 60
 var TEMPLATE = '<h1><span class="js-timer-minutes">00</span>:<span class="js-timer-seconds">00</span></h1>'
+var ALERT_PERIOD_IN_SECS = 30
+const quotes = [
+    'Look on the bright side',
+    'There’s light at theend of the tunnel',
+    'When life gives you lemons, make lemonade',
+    'Every cloud has a silver lining',
+    'Keep your chin up',
+    'There are plenty of fish in the sea',
+    'When one door closes, another one opens',
+    'Everything is coming up roses',
+];
+
+function getMotivationAlerst() {
+  return quotes[Math.floor(Math.random() * quotes.length)];
+}
 
 function padZero(number){
   return ("00" + String(number)).slice(-2);
@@ -41,6 +56,10 @@ class Timer{
     var secsGone = currentTimestamp - this.timestampOnStart
     return Math.max(this.timeout_in_secs - secsGone, 0)
   }
+
+  runOutOfTime() {
+    return this.calculateSecsLeft() === 0
+  }
 }
 
 class TimerWidget{
@@ -56,7 +75,18 @@ class TimerWidget{
     // adds HTML tag to current page
     this.timerContainer = document.createElement('div')
 
-    this.timerContainer.setAttribute("style", "height: 100px;")
+    var timerStyle =
+       "position: fixed;" +
+       "top: 30px;" +
+       "left: 18px;" +
+       "z-index: 9999;" +
+       "margin: 0px;" +
+       "color: #F4A460;" +
+       "background-color: #F5DEB3;" +
+       "padding: 0px;" +
+       "border-radius: 40px;";
+
+    this.timerContainer.setAttribute("style", timerStyle)
     this.timerContainer.innerHTML = TEMPLATE
 
     rootTag.insertBefore(this.timerContainer, rootTag.firstChild)
@@ -67,9 +97,10 @@ class TimerWidget{
   update(secsLeft){
     var minutes = Math.floor(secsLeft / 60);
     var seconds = secsLeft - minutes * 60;
-
-    this.minutes_element.innerHTML = padZero(minutes)
-    this.seconds_element.innerHTML = padZero(seconds)
+    if (secsLeft) {
+      this.minutes_element.innerHTML = padZero(minutes)
+      this.seconds_element.innerHTML = padZero(seconds)
+    }
   }
   unmount(){
     if (!this.timerContainer)
@@ -83,14 +114,28 @@ class TimerWidget{
 function main(){
 
   var timer = new Timer(TIMEOUT_IN_SECS)
-  var timerWiget = new TimerWidget()
+  var alertTimer = new Timer(ALERT_PERIOD_IN_SECS);
+  var timerWidget = new TimerWidget()
   var intervalId = null
+  var intervalAlert = null
 
-  timerWiget.mount(document.body)
+  timerWidget.mount(document.body)
 
   function handleIntervalTick(){
     var secsLeft = timer.calculateSecsLeft()
-    timerWiget.update(secsLeft)
+    timerWidget.update(secsLeft)
+  }
+
+  function handleAlerts() {
+    if (timer.runOutOfTime()) {
+      alertTimer.start();
+      timerWidget.unmount()
+    }
+
+    if (alertTimer.runOutOfTime()) {
+      alert(getMotivationAlerst())
+      alertTimer = new Timer(ALERT_PERIOD_IN_SECS)
+    }
   }
 
   function handleVisibilityChange(){
@@ -101,6 +146,7 @@ function main(){
     } else {
       timer.start()
       intervalId = intervalId || setInterval(handleIntervalTick, 300)
+      intervalAlert = intervalAlert || setInterval(handleAlerts, 300)
     }
   }
 
