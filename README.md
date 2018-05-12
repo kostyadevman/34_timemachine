@@ -8,7 +8,7 @@ Install extension for Chrome browser [Custom JavaScript for websites](https://ch
 
 Open configuration of [cjs](https://chrome.google.com/webstore/detail/custom-javascript-for-web/poakhlngfciodnhlhhgnaaelnpjljija) browser extension on the site you want to controll. Click on the link "your own external scripts", add path https://cdn.rawgit.com/kostyadevman/34_timemachine/0250a2fa/index.js. Don`t forget to press "enable cjs for this host" to enable custom JS.
 
-A small amazing timer appears in the left corner of the site you surfing. After 3 minutes it will disappear, but every 30 seconds will be show motivation phrases. Bro, it  help you to save your time, wisily, isn't it?
+A small amazing timer appears in the left corner of the site you surfing. After 3 minutes it will disappear, but every 30 seconds will be show motivation phrases. Bro, it  help you to save your time, wisely, isn't it?
 
 For faster development you can use JS code hosted on localhost. Simple web server can be used for that, run:
 
