@@ -1,5 +1,5 @@
 var TIMEOUT_IN_SECS = 3 * 60
-var TEMPLATE = '<h1><span class="js-timer-minutes">00</span>:<span class="js-timer-seconds">00</span></h1>'
+var TEMPLATE = '<span class="js-timer-minutes">00</span>:<span class="js-timer-seconds">00</span>'
 var ALERT_PERIOD_IN_SECS = 30
 const quotes = [
     'Look on the bright side',
@@ -81,10 +81,11 @@ class TimerWidget{
        "left: 18px;" +
        "z-index: 9999;" +
        "margin: 0px;" +
-       "color: #F4A460;" +
-       "background-color: #F5DEB3;" +
-       "padding: 0px;" +
+       "color: green;" +
+       "background-color: lightcyan;" +
+       "padding: 2px;" +
        "border-radius: 40px;";
+
 
     this.timerContainer.setAttribute("style", timerStyle)
     this.timerContainer.innerHTML = TEMPLATE
@@ -141,10 +142,16 @@ function main(){
   function handleVisibilityChange(){
     if (document.hidden) {
       timer.stop()
+      alertTimer.stop()
       clearInterval(intervalId)
+      clearInterval(intervalAlert)
       intervalId = null
+      intervalAlert = null
     } else {
       timer.start()
+      if (timer.runOutOfTime()) {
+        alertTimer.start()
+      }
       intervalId = intervalId || setInterval(handleIntervalTick, 300)
       intervalAlert = intervalAlert || setInterval(handleAlerts, 300)
     }
